@@ -112,6 +112,10 @@ enum ChameleonCommand {
   scanPacTag(3014),
   writePacToT5577(3015),
   writeIdteckToT5577(3018),
+  scanAwidTag(3021),
+  writeAwidToT5577(3022),
+  scanParadoxTag(3023),
+  writeParadoxToT5577(3024),
   ioProxDecodeRaw(3012),
   ioProxComposeID(3013),
   adcGenericRead(3009),
@@ -184,7 +188,13 @@ enum ChameleonCommand {
   getIoProxEmulatorID(5009),
 
   setIdteckEmulatorID(5012),
-  getIdteckEmulatorID(5013);
+  getIdteckEmulatorID(5013),
+
+  setAwidEmulatorID(5014),
+  getAwidEmulatorID(5015),
+
+  setParadoxEmulatorID(5016),
+  getParadoxEmulatorID(5017);
 
   const ChameleonCommand(this.value);
   final int value;
@@ -201,6 +211,8 @@ enum TagType {
   viking(170),
   hidProx(200),
   ioProx(201),
+  awid(202),
+  paradox(203),
   idteck(310),
   mifareMini(1000),
   mifare1K(1001),

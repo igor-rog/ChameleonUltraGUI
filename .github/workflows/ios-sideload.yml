@@ -1,0 +1,68 @@
+name: iOS sideload IPA
+
+# Builds an UNSIGNED .ipa for sideloading (AltStore / SideStore / Sideloadly).
+# No Apple account or certificates needed here — the sideloading tool re-signs
+# the app with the user's own free Apple ID when they install it.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "chameleonultragui/**"
+      - ".github/workflows/ios-sideload.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-ios-ipa:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ./chameleonultragui
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Install native build tools
+        run: brew install automake libtool
+
+      - run: flutter pub get
+
+      - name: Build unsigned iOS app
+        run: flutter build ios --release --no-codesign --build-number ${{ github.run_number }}
+
+      - name: Package unsigned IPA
+        run: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -R Runner.app Payload/
+          zip -qr ChameleonUnleashed-unsigned.ipa Payload
+          rm -rf Payload
+          ls -la
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-unsigned-ipa
+          path: chameleonultragui/build/ios/iphoneos/ChameleonUnleashed-unsigned.ipa
+
+      - name: Publish to ios-sideload prerelease
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ios-sideload
+          name: iOS sideload build (unsigned)
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+          body: |
+            **Unsigned iOS build for sideloading.** Install with AltStore / SideStore
+            or Sideloadly — they re-sign it with your own free Apple ID.
+
+            Requires the custom ChameleonUnleashed firmware on your Chameleon Ultra
+            (for AWID / Paradox support). Built from commit ${{ github.sha }}.
+          files: chameleonultragui/build/ios/iphoneos/ChameleonUnleashed-unsigned.ipa

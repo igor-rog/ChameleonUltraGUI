@@ -835,6 +835,10 @@ class AwidCard extends LFCard {
     return AwidCard.fromBytes(composeAwid(fc, cn));
   }
 
+  factory AwidCard.fromUID(String uid) {
+    return AwidCard.fromBytes(hexToBytes(uid));
+  }
+
   @override
   String toViewableString() {
     return 'FC: $facilityCode, CN: $cardNumber (fmt $format)';
@@ -865,6 +869,10 @@ class ParadoxCard extends LFCard {
 
   factory ParadoxCard.fromFields(int fc, int cn) {
     return ParadoxCard.fromBytes(composeParadox(fc, cn));
+  }
+
+  factory ParadoxCard.fromUID(String uid) {
+    return ParadoxCard.fromBytes(hexToBytes(uid));
   }
 
   @override
